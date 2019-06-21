@@ -1,0 +1,327 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <form>
+        <p>
+
+            <input type="button" name="deflate1" value="Deflate" onclick="deflate()">
+            <input type="button" name="rotate1" value="Rotate Right" onclick="rotateRight()">
+            <input type="button" name="rotate2" value="Rotate Left" onclick="rotateLeft()">
+            <input type="button" name="zoom" value="Zoom In" onclick="zoomIn()">
+            <input type="button" name="zoom2" value="Zoom Out" onclick="zoomOut()">
+            <input type="button" name="arc" value="Draw Arcs" onclick="drawArc()">
+            <input type="button" name="erasearc" value="Erase Arcs" onclick="eraseArc()">
+            <input type="button" name="delete" value="Delete Shape" onclick="changeToDeleteMode()">
+        </p>
+
+    </form>     
+    <canvas id="canvas" width="1000" height="600"></canvas>
+    <script>
+    
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+
+        
+        var info=[[],[],[],[]];
+        var newInfo=[[],[],[],[]];
+        var totalTiles=1
+        var length=200
+        var phi=(1+Math.sqrt(5))/2
+        var deleteMode=0
+        
+        var colorKite="#6AB1DA"
+        var colorDart="#a6a6a6"
+        info[0][0]=500
+        info[1][0]=400
+        info[2][0]=270
+        info[3][0]=1
+        drawTiles()
+        
+        
+        function drawTiles() {
+            context.clearRect(0,0,1000,1000)
+            for (var i=0; i<totalTiles; i++) {
+                var x1=info[0][i]
+                var y1=info[1][i]
+                var x2=x1+length*Math.cos((info[2][i]-36)*Math.PI/180)
+                var y2=y1+length*Math.sin((info[2][i]-36)*Math.PI/180)
+                var x3=x1+length*Math.cos(info[2][i]*Math.PI/180)
+                var y3=y1+length*Math.sin(info[2][i]*Math.PI/180)
+                if (info[3][i]==1) {
+                    x3=x1+length/phi*Math.cos(info[2][i]*Math.PI/180)
+                    y3=y1+length/phi*Math.sin(info[2][i]*Math.PI/180)  
+                    
+                }
+                var x4=x1+length*Math.cos((info[2][i]+36)*Math.PI/180)
+                var y4=y1+length*Math.sin((info[2][i]+36)*Math.PI/180)
+                
+
+                context.beginPath();
+                context.moveTo(x1,y1);
+                context.lineTo(x2,y2);
+                context.lineTo(x3,y3);
+                context.lineTo(x4,y4);
+                context.closePath();
+                context.fillStyle=colorKite;
+                if (info[3][i]==1) {context.fillStyle=colorDart}
+                context.fill()
+                context.lineWidth=length/90
+                context.strokeStyle="#041C2A";
+                context.stroke();
+                context.write
+                
+            }
+        }    
+            
+        function deflate(){        
+            var tempData=[[],[],[],[]]
+            for (var i=0; i<totalTiles; i++) {
+                tempData[0][i]=info[0][i]
+                tempData[1][i]=info[1][i]
+                tempData[2][i]=info[2][i]
+                tempData[3][i]=info[3][i]
+            }
+            var t=0; //total number of new shapes
+            for (var i=0; i<totalTiles; i++) {
+                if (tempData[3][i]==1) {
+                    info[0][t]=tempData[0][i]
+                    info[1][t]=tempData[1][i]
+                    info[2][t]=tempData[2][i]
+                    info[3][t]=0
+                    t++
+                    info[0][t]=tempData[0][i]+length*Math.cos((tempData[2][i]-36)*Math.PI/180)
+                    info[1][t]=tempData[1][i]+length*Math.sin((tempData[2][i]-36)*Math.PI/180)
+                    info[2][t]=tempData[2][i]+144
+                    if (info[2][t]<0) {info[2][t]+=360}
+                    if (info[2][t]>=360) {info[2][t]-=360}
+                    info[3][t]=1
+                    t++
+                    
+                    info[0][t]=tempData[0][i]+length*Math.cos((tempData[2][i]+36)*Math.PI/180)
+                    info[1][t]=tempData[1][i]+length*Math.sin((tempData[2][i]+36)*Math.PI/180)
+                    info[2][t]=tempData[2][i]+216
+                    if (info[2][t]<0) {info[2][t]+=360}
+                    if (info[2][t]>=360) {info[2][t]-=360}
+                    info[3][t]=1
+                    t++  
+                }
+                
+                if (tempData[3][i]==0) {
+                    info[0][t]=tempData[0][i]
+                    info[1][t]=tempData[1][i]
+                    info[2][t]=tempData[2][i]+36
+                    if (info[2][t]<0) {info[2][t]+=360}
+                    if (info[2][t]>=360) {info[2][t]-=360}
+                    info[3][t]=1
+                    t++
+                    
+                    info[0][t]=tempData[0][i]
+                    info[1][t]=tempData[1][i]
+                    info[2][t]=tempData[2][i]-36
+                    if (info[2][t]<0) {info[2][t]+=360}
+                    if (info[2][t]>=360) {info[2][t]-=360}
+                    info[3][t]=1
+                    t++
+                    
+                    info[0][t]=tempData[0][i]+length*Math.cos((tempData[2][i]-36)*Math.PI/180)
+                    info[1][t]=tempData[1][i]+length*Math.sin((tempData[2][i]-36)*Math.PI/180)
+                    info[2][t]=tempData[2][i]+108
+                    if (info[2][t]<0) {info[2][t]+=360}
+                    if (info[2][t]>=360) {info[2][t]-=360}
+                    info[3][t]=0
+                    t++
+                    
+                    info[0][t]=tempData[0][i]+length*Math.cos((tempData[2][i]+36)*Math.PI/180)
+                    info[1][t]=tempData[1][i]+length*Math.sin((tempData[2][i]+36)*Math.PI/180)
+                    info[2][t]=tempData[2][i]+252
+                    if (info[2][t]<0) {info[2][t]+=360}
+                    if (info[2][t]>=360) {info[2][t]-=360}
+                    info[3][t]=0
+                    t++   
+                }
+            }
+            
+            totalTiles=t
+            length=length/phi
+            for (var i=0; i<totalTiles; i++) {
+                for (var j=i+1; j<totalTiles; j++){
+                    
+                    if (Math.abs(info[0][i]-info[0][j])<0.0000001 && Math.abs(info[1][i]-info[1][j])<0.0000001 && info[2][i]==info[2][j] && info[3][i]==info[3][j]){
+                        info[0].splice(j,1)
+                        info[1].splice(j,1)
+                        info[2].splice(j,1) 
+                        info[3].splice(j,1)
+                        totalTiles-=1;
+                    }
+                }  
+            }
+            
+            /*var numberKite=0
+            var numberDart=0
+            for (var i=0; i<totalTiles; i++) {
+                if (info[3][i]==0){numberKite+=1}
+                if (info[3][i]==1){numberDart+=1}    
+            }
+            alert(numberKite)
+            alert(numberDart)*/
+            drawTiles()
+        }
+        
+        function zoomIn() {          
+            for (var i=0; i<totalTiles; i++) {
+                info[0][i]=500+(-500+info[0][i])*phi;
+                info[1][i]=300+(-300+info[1][i])*phi;         
+            }
+            length=length*phi;
+            context.clearRect(0,0,1000,1000)
+            drawTiles() 
+        }
+        
+        function zoomOut() {        
+            for (var i=0; i<totalTiles; i++) {
+                info[0][i]=500+(-500+info[0][i])/phi;
+                info[1][i]=300+(-300+info[1][i])/phi;    
+            }
+            length=length/phi;
+            context.clearRect(0,0,1000,1000)
+            drawTiles() 
+        }
+        
+        function rotateRight(){
+            for (var i=0; i<totalTiles; i++) {
+                newX=info[0][i]-500
+                newY=info[1][i]-300
+                info[0][i]=500+((newX)*Math.cos(36*Math.PI/180)-(newY)*Math.sin(36*Math.PI/180));
+                info[1][i]=300+((newY)*Math.cos(36*Math.PI/180)+(newX)*Math.sin(36*Math.PI/180));
+                info[2][i]=info[2][i]+36;
+                if (info[2][i]<0) {info[2][i]+=360}
+                if (info[2][i]>=360) {info[2][i]-=360}
+            }    
+            context.clearRect(0,0,1000,1000)
+            drawTiles()
+        }
+        
+        function rotateLeft(){
+            for (var i=0; i<totalTiles; i++) {
+                newX=info[0][i]-500
+                newY=info[1][i]-300
+                info[0][i]=500+((newX)*Math.cos(-36*Math.PI/180)-(newY)*Math.sin(-36*Math.PI/180));
+                info[1][i]=300+((newY)*Math.cos(-36*Math.PI/180)+(newX)*Math.sin(-36*Math.PI/180));
+                info[2][i]=info[2][i]-36;
+                if (info[2][i]<0) {info[2][i]+=360}
+                if (info[2][i]>=360) {info[2][i]-=360}
+            }   
+            context.clearRect(0,0,1000,1000)
+            drawTiles()
+        }
+        
+        function drawRedArc(){
+            for (var i=0; i<totalTiles; i++) {
+                context.beginPath();
+                context.strokeStyle="#f28d8d"
+                context.lineWidth=length/50
+                if (info[3][i]==0){
+                    context.arc(info[0][i],info[1][i],length/phi,(info[2][i]-36)*Math.PI/180,(info[2][i]+36)*Math.PI/180)
+                }    
+                if (info[3][i]==1){
+                    context.arc(info[0][i],info[1][i],(length/phi)/phi,(info[2][i]-36)*Math.PI/180,(info[2][i]+36)*Math.PI/180)
+                }
+            context.stroke()
+            }
+        }
+        
+        function drawGreenArc(){
+            for (var i=0; i<totalTiles; i++) {
+                context.beginPath();
+                context.strokeStyle="#6495ED" 
+                context.lineWidth=length/50
+                if (info[3][i]==0){
+                    x2=info[0][i]+length*Math.cos(info[2][i]*Math.PI/180)
+                    y2=info[1][i]+length*Math.sin(info[2][i]*Math.PI/180)
+                    context.arc(x2,y2,(length/phi)/phi,(info[2][i]+108)*Math.PI/180,(info[2][i]-108)*Math.PI/180)         
+                }     
+                if (info[3][i]==1){
+                    x2=info[0][i]+(length/phi)*Math.cos(info[2][i]*Math.PI/180)
+                    y2=info[1][i]+(length/phi)*Math.sin(info[2][i]*Math.PI/180)
+                    context.arc(x2,y2,((length/phi)/phi)/phi,(info[2][i]+72)*Math.PI/180,(info[2][i]-72)*Math.PI/180)     
+                }
+            context.stroke()
+            }
+        }
+        
+        function drawArc(){
+            colorKite="#D8D8D8"
+            colorDart="#b3b3b3"
+            context.clearRect(0,0,1000,1000)
+            drawTiles()
+            drawRedArc()
+            drawGreenArc() 
+        }
+
+        function eraseArc(){
+            colorKite="#6AB1DA"
+            colorDart="#A4A9AC"
+            context.clearRect(0,0,1000,1000)
+            drawTiles()
+        }
+        
+        
+        canvas.addEventListener("mousedown", mouseDown, false);
+        
+        
+        function distance(x1,y1,x2,y2){
+            return Math.sqrt(Math.pow(x1-x2,2)+Math.pow(y1-y2,2))
+        }
+        
+        var mouseX=0;
+        var mouseY=0;
+        function mouseDown(e){
+            mouseX=e.pageX-canvas.offsetLeft
+            mouseY=e.pageY-canvas.offsetTop
+            deleteShape()
+        }
+        
+        function deleteShape(){
+            if (deleteMode==1) {
+                var closestDistance=1000000
+                var closestIndex=-1
+                for (var i=0; i<totalTiles; i++) {
+
+                    x=info[0][i]+(length/phi)*Math.cos(info[2][i]*Math.PI/180)
+                    y=info[1][i]+(length/phi)*Math.sin(info[2][i]*Math.PI/180)
+                    d=distance(mouseX,mouseY,x,y)
+                    if (d<closestDistance){
+                        closestDistance=d
+                        closestIndex=i
+                    } 
+                }
+                if (closestIndex==-1){return;}
+                else {
+                    info[0].splice(closestIndex,1)
+                    info[1].splice(closestIndex,1)
+                    info[2].splice(closestIndex,1) 
+                    info[3].splice(closestIndex,1)
+                }
+                totalTiles-=1;
+                context.clearRect(0,0,1000,1000)
+                drawTiles()
+            }
+        }
+        
+        
+        function changeToDeleteMode(){
+            if (deleteMode==0) {deleteMode=1} 
+            else {deleteMode=0}
+        }
+
+    </script>
+  </body>
+</html>     
